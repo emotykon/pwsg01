@@ -184,7 +184,7 @@ namespace wpf_lab2_2
         private void MySquare_MouseDown(object sender, MouseButtonEventArgs e)
         {
             // 'sender' to obiekt, który właśnie został kliknięty
-            Rectangle clickedSquare = sender as Rectangle;
+            Rectangle? clickedSquare = sender as Rectangle;
 
             if (clickedSquare != null)
             {
