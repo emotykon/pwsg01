@@ -1,0 +1,92 @@
+﻿<Window x:Class="wpf_lab2_2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:wpf_lab2_2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" ResizeMode="CanMinimize">
+    
+    <Window.Resources>
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                            CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Options">
+                <MenuItem IsCheckable="True" Header="Save"></MenuItem>
+                <MenuItem Header="Exit" Click="EXIT"></MenuItem>
+            </MenuItem>
+        </Menu>
+        
+    <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+        
+            <UniformGrid Rows="1" Grid.Column="1" Grid.Row="1" Background="Chocolate">
+                <Button Style="{StaticResource ModernButtonStyle}"  Click="action1">
+                    <TextBox x:Name="CInput">1</TextBox>
+                </Button>
+                <Button Content="action2" Click="action2"></Button>
+            </UniformGrid>
+
+            <Canvas MouseDown="PaintCanvas_MouseDown" Grid.Column="0" Grid.Row="0" Name="myCanvas" Background="LightGray">
+                
+                <Line X1="10" Y1="10" X2="200" Y2="10" Stroke="Black" StrokeThickness="2" />
+                
+                <Rectangle Canvas.Left="50" Canvas.Top="50" Width="100" Height="50" 
+               Fill="Blue" Stroke="Black" />
+                
+                <Ellipse Canvas.Left="200" Canvas.Top="100" Width="60" Height="60" 
+             Fill="Red" />
+                
+            </Canvas>
+        
+            <Grid Grid.Column="1" Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                
+                <DataGrid  Grid.Row="0" ItemsSource="{Binding Observable}" >
+                </DataGrid>
+                
+                <ListBox Grid.Row="1" ItemsSource="{Binding Observable}">
+                    <ListBox.ItemTemplate>
+                        
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="10" Height="10" Fill="Green" Margin="5"/>
+                                <TextBlock Text="{Binding n1}" FontWeight="Bold" />
+                                <TextBox Text="{Binding n2}" FontWeight="Bold" />
+                            </StackPanel>
+                        </DataTemplate>
+                        
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                
+            </Grid>
+        </Grid>
+
+    </DockPanel>
+</Window>
