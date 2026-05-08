@@ -1,0 +1,135 @@
+1. Usuwanie elementu przez kliknięcie (Prawy przycisk myszy)
+To najwygodniejszy sposób dla użytkownika. Możesz podpiąć zdarzenie MouseDown do każdego kształtu, który tworzysz.
+
+C#
+private void DrawCircle(double x, double y)
+{
+    Ellipse circle = new Ellipse { Width = 20, Height = 20, Fill = Brushes.Red };
+    
+    // Podpinamy zdarzenie kliknięcia prawym przyciskiem pod konkretne kółko
+    circle.MouseRightButtonDown += (s, e) => 
+    {
+        // 's' to obiekt, który wywołał zdarzenie (nasze kółko)
+        MyCanvas.Children.Remove(s as UIElement);
+    };
+
+    Canvas.SetLeft(circle, x);
+    Canvas.SetTop(circle, y);
+    MyCanvas.Children.Add(circle);
+}
+2. Wybieranie elementu (Hit Testing)
+Jeśli nie chcesz przypisywać zdarzeń do każdego elementu z osobna, możesz użyć mechanizmu Hit Testing w głównym zdarzeniu MouseDown Twojej Canvy. Sprawdza on, czy pod kursorem myszy znajduje się jakiś obiekt.
+
+C#
+private void MyCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+{
+    // Pobieramy punkt kliknięcia
+    Point mousePos = e.GetPosition(MyCanvas);
+    
+    // Szukamy, czy pod tym punktem jest jakiś element
+    HitTestResult result = VisualTreeHelper.HitTest(MyCanvas, mousePos);
+
+    if (result != null && result.VisualHit is Shape clickedShape)
+    {
+        // Jeśli trafiliśmy w kształt (np. linię lub prostokąt) - usuwamy go
+        MyCanvas.Children.Remove(clickedShape);
+    }
+}
+3. Usuwanie przez nazwę (Tagowanie)
+Jeśli dodajesz elementy i chcesz je później usunąć programowo (np. "usuń wszystkie czerwone kółka"), możesz użyć właściwości .Tag.
+
+C#
+// Przy tworzeniu:
+line.Tag = "temporary_line";
+
+// Przy usuwaniu:
+var toRemove = MyCanvas.Children.OfType<FrameworkElement>()
+                                .Where(x => x.Tag?.ToString() == "temporary_line")
+                                .ToList();
+
+foreach (var item in toRemove)
+{
+    MyCanvas.Children.Remove(item);
+}
+4. Wykorzystanie ListBox do zarządzania elementami
+Często łączy się Canvas z ListBox. Gdy narysujesz kształt, dodajesz go do Canvas, ale też dodajesz jego opis do ListBox.
+
+Użytkownik zaznacza pozycję na liście i klika przycisk "Usuń zaznaczone".
+
+W kodzie wykonujesz: MyCanvas.Children.Remove(element).
+
+Podsumowanie - którą metodę wybrać?
+Jeśli robisz prosty edytor: Metoda 1 (zdarzenie na obiekcie) jest najszybsza do napisania.
+
+Jeśli masz bardzo dużo małych elementów (np. kropki): Metoda 2 (Hit Testing) jest bardziej elegancka.
+
+Jeśli chcesz mieć pełną kontrolę i np. listę warstw: Metoda 4 (ListBox) jest najbardziej profesjonalna.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+chciałbym zrobic kwadrat który jak go nacisnę zmienia pozycję na losową
+
+Aby to osiągnąć, musisz połączyć obsługę zdarzenia myszy (MouseDown) z generowaniem liczb losowych oraz pozycjonowaniem na Canvas.
+
+Oto najprostszy sposób, jak to zakodować:
+
+1. XAML
+Umieść Rectangle wewnątrz kontenera Canvas. Nadaj mu nazwę, aby móc się do niego odwołać, oraz ustaw kolor, by był widoczny.
+
+XML
+<Canvas x:Name="MyCanvas" Background="Transparent">
+    <Rectangle x:Name="MySquare" 
+               Width="50" Height="50" 
+               Fill="Blue" 
+               Canvas.Left="100" Canvas.Top="100"
+               MouseDown="MySquare_MouseDown" />
+</Canvas>
+2. Kod C# (MainWindow.xaml.cs)
+W obsłudze zdarzenia użyjemy klasy Random do wylosowania nowych współrzędnych.
+
+C#
+private void MySquare_MouseDown(object sender, MouseButtonEventArgs e)
+{
+    Random rnd = new Random();
+
+    // 1. Obliczamy maksymalny dopuszczalny zakres, aby kwadrat nie wyleciał poza okno
+    // Canvas.ActualWidth to aktualna szerokość dostępnego miejsca
+    double maxX = MyCanvas.ActualWidth - MySquare.Width;
+    double maxY = MyCanvas.ActualHeight - MySquare.Height;
+
+    // 2. Losujemy nową pozycję (od 0 do max)
+    double newX = rnd.NextDouble() * maxX;
+    double newY = rnd.NextDouble() * maxY;
+
+    // 3. Ustawiamy nowe współrzędne
+    Canvas.SetLeft(MySquare, newX);
+    Canvas.SetTop(MySquare, newY);
+}
+Dlaczego to działa w ten sposób?
+MouseDown: Zdarzenie odpala się w momencie, gdy kursor znajduje się nad kwadratem i wciśniesz przycisk myszy.
+
+ActualWidth / ActualHeight: Używamy tych właściwości, ponieważ Width może być nieustawione (auto), a ActualWidth zawsze podaje realny rozmiar kontrolki na ekranie w pikselach.
+
+Canvas.SetLeft / SetTop: To jedyny sposób, aby zmienić pozycję elementu wewnątrz Canvas z poziomu kodu C#.
+
+Małe ulepszenie (płynny skok)
+Jeśli chcesz, aby kwadrat nie "teleportował się", ale płynnie przeleciał w nowe miejsce, możesz zamienić ostatnie dwie linijki na prostą animację, o której rozmawialiśmy wcześniej:
+
+C#
+using System.Windows.Media.Animation;
+
+// Zamiast SetLeft/SetTop użyj:
+MySquare.BeginAnimation(Canvas.LeftProperty, new DoubleAnimation(newX, TimeSpan.FromMilliseconds(200)));
+MySquare.BeginAnimation(Canvas.TopProperty, new DoubleAnimation(newY, TimeSpan.FromMilliseconds(200)));
+Teraz Twój kwadrat będzie "uciekał" przed myszką w sposób bardziej efektowny!
