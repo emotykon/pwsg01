@@ -31,6 +31,7 @@
                 <MenuItem IsCheckable="True" Header="Save"></MenuItem>
                 <MenuItem Header="Exit" Click="EXIT"></MenuItem>
             </MenuItem>
+            <MenuItem Header="Stwórz uciekający kwadrat" Click="CreateSquare_Click" />
         </Menu>
         
     <Grid>
@@ -50,7 +51,7 @@
                 <Button Content="action2" Click="action2"></Button>
             </UniformGrid>
 
-            <Canvas MouseDown="PaintCanvas_MouseDown" Grid.Column="0" Grid.Row="0" Name="myCanvas" Background="LightGray">
+            <Canvas MouseMove="MouseMV" MouseUp="MouseUP" MouseDown="PaintCanvas_MouseDown" Grid.Column="0" Grid.Row="0" Name="myCanvas" Background="LightGray">
                 
                 <Line X1="10" Y1="10" X2="200" Y2="10" Stroke="Black" StrokeThickness="2" />
                 
@@ -86,6 +87,8 @@
                 </ListBox>
                 
             </Grid>
+            <ProgressBar x:Name="myPB" Grid.Column="0" Grid.Row="1" >
+            </ProgressBar>
         </Grid>
 
     </DockPanel>
