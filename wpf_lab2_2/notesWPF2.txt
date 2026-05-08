@@ -133,3 +133,52 @@ using System.Windows.Media.Animation;
 MySquare.BeginAnimation(Canvas.LeftProperty, new DoubleAnimation(newX, TimeSpan.FromMilliseconds(200)));
 MySquare.BeginAnimation(Canvas.TopProperty, new DoubleAnimation(newY, TimeSpan.FromMilliseconds(200)));
 Teraz Twój kwadrat będzie "uciekał" przed myszką w sposób bardziej efektowny!
+
+
+
+W WPF Template (Szablon) to mechanizm, który pozwala całkowicie oddzielić logikę kontrolki od jej wyglądu. Możesz mieć przycisk, który zachowuje się jak przycisk (można go kliknąć), ale wizualnie wygląda jak kółko, gwiazdka czy suwak.Wyróżniamy dwa główne rodzaje szablonów:ControlTemplate – definiuje "szkielet" wizualny kontrolki (np. jak wygląda Button).DataTemplate – definiuje, jak mają być wyświetlane dane (np. jak ma wyglądać obiekt User na liście).1. ControlTemplate – Zmiana wyglądu kontrolkiTo narzędzie pozwala Ci "rozebrać" kontrolkę i złożyć ją od nowa.Przykład: Okrągły przyciskZamiast standardowego prostokąta, stworzymy przycisk, który jest okręgiem.XML<Button Content="OK" Width="60" Height="60">
+    <Button.Template>
+        <ControlTemplate TargetType="Button">
+            <Grid>
+                <!-- Nasz nowy wygląd: Elipsa zamiast prostokąta -->
+                <Ellipse x:Name="BackgroundCircle" Fill="LightBlue" Stroke="Blue" StrokeThickness="2"/>
+                
+                <!-- ContentPresenter to kluczowy element - tu trafi tekst "OK" -->
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+            
+            <!-- Wyzwalacze, aby przycisk reagował na najechanie myszą -->
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="BackgroundCircle" Property="Fill" Value="DeepSkyBlue"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Button.Template>
+</Button>
+2. DataTemplate – Wygląd danychUżywamy go, gdy mamy kolekcję obiektów (np. w ListBox) i nie chcemy wyświetlać ich jako zwykły tekst (wynik ToString()), ale jako złożony układ.Przykład: Lista produktów ze zdjęciem i cenąZałóżmy, że mamy klasę Product z właściwościami Name, Price i Image.XML<ListBox ItemsSource="{Binding Products}">
+    <ListBox.ItemTemplate>
+        <DataTemplate>
+            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="5" Padding="5">
+                <StackPanel Orientation="Horizontal">
+                    <!-- Ikona produktu -->
+                    <Ellipse Width="40" Height="40" Fill="Orange" Margin="5"/>
+                    
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock Text="{Binding Price, StringFormat='Cena: {0:C}'}" Foreground="Green"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </ListBox.ItemTemplate>
+</ListBox>
+3. ItemsPanelTemplate – Zmiana układu listyTen szablon decyduje o tym, jak ułożone są elementy wewnątrz kontenera (np. ListBox czy ItemsControl). Domyślnie ListBox układa elementy jeden pod drugim. Możemy to zmienić na WrapPanel.Przykład: Galeria kafelkówZamiast listy pionowej, zrobimy siatkę, która zawija elementy.XML<ListBox ItemsSource="{Binding Photos}">
+    <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+            <!-- Elementy będą się układać obok siebie i zawijać do nowej linii -->
+            <WrapPanel IsItemsHost="True" />
+        </ItemsPanelTemplate>
+    </ListBox.ItemsPanel>
+</ListBox>
+Kluczowe pojęcia w szablonachContentPresenter: "Miejsce na treść". Musisz go umieścić w ControlTemplate, inaczej to, co wpiszesz w Content="..." przycisku, nie wyświetli się.TemplateBinding: Służy do łączenia właściwości szablonu z właściwościami kontrolki.Przykład: Fill="{TemplateBinding Background}" sprawi, że kształt wewnątrz szablonu przyjmie kolor ustawiony w Background przycisku.ItemsPresenter: Analogicznie do ContentPresenter, ale dla kontenerów z wieloma elementami (np. Menu czy TreeView).Kiedy czego używać? (Szybka ściąga)ProblemCo zastosować?Chcę, żeby CheckBox wyglądał jak przełącznik (Toggle Switch).ControlTemplateChcę, żeby każdy element w ComboBox miał ikonę i opis.DataTemplateChcę, żeby ListBox wyświetlał elementy w kółku, a nie w linii.ItemsPanelTemplateChcę zmienić kolor przycisku po najechaniu myszką (bez zmiany struktury).Style + TriggersSzablony to najpotężniejsza część WPF. Pozwalają one na stworzenie interfejsu, który w ogóle nie przypomina standardowego Windowsa, zachowując przy tym pełną funkcjonalność standardowych kontrolek.
